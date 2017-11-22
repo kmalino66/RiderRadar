@@ -3,12 +3,16 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
+        android:id="@+id/menu_search"
         android:icon="@drawable/ic_search_black_48dp"
         android:title="@string/menu_main_search"
         app:showAsAction="ifRoom" />
     <item
+        android:id="@+id/menu_time_select"
         android:icon="@drawable/ic_timelapse_black_48dp"
         android:title="@string/menu_main_time"
         app:showAsAction="ifRoom" />
-    <item android:title="@string/menu_main_settings" />
+    <item
+        android:id="@+id/menu_settings"
+        android:title="@string/menu_main_settings" />
 </menu>

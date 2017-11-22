@@ -12,23 +12,30 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <net.trizmo.riderradar.CircleProgressBar
-            android:id="@+id/custom_progressBar"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="75dp"
-            android:layout_gravity="center_vertical"
-            app:progress="100"
-            app:progressbarColor="@color/colorPrimary"
-            app:progressBarThickness="6dp"/>
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textAlignment="center"
-            android:textSize="50dp"
-            android:text="Details"/>
+            <View
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
 
+            <net.trizmo.riderradar.CircleProgressBar
+                android:id="@+id/custom_progressBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight=".5"
+                app:progress="100"
+                app:progressBarThickness="6dp"
+                app:progressbarColor="@color/colorPrimary" />
+            <View
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+        </LinearLayout>
     </LinearLayout>
 
 

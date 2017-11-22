@@ -97,8 +97,6 @@ public class CircleProgressBar extends View {
         int height = bounds.height();
 
         canvas.drawText((int)(progress) + "", canvas.getWidth() / 2, (canvas.getHeight() / 2) + (height / 2), textPaint);
-
-
     }
 
     public void setProgress(float progress) {

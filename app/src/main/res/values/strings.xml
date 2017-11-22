@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">RiderRadar</string>
+    <string name="main_details_text">Details</string>
 </resources>

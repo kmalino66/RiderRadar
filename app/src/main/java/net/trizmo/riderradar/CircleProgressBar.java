@@ -30,7 +30,7 @@ public class CircleProgressBar extends View {
      */
     private int startAngle = -90;
     private int color = Color.DKGRAY;
-    private int backgroundColor = Color.parseColor("#90a4ae");
+    private int backgroundColor = Color.parseColor("#FF000000");
     private RectF rectF;
     private Paint backgroundPaint;
     private Paint foregroundPaint;

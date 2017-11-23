@@ -1,5 +1,7 @@
 package net.trizmo.riderradar;
 
+import net.trizmo.riderradar.weather.WeatherObject;
+
 /**
  * Created by trizm on 11/22/2017.
  */
@@ -15,6 +17,13 @@ public class WeatherScore {
         this.temperature = temperature;
         this.windspeed = windspeed;
         this.percentOfPrecipitation = percentOfPrecipitation;
+    }
+
+    public WeatherScore(WeatherObject weatherObject)
+    {
+        this.temperature = weatherObject.getTemperature();
+        this.windspeed = weatherObject.getWindspeed();
+        this.percentOfPrecipitation = weatherObject.getPercentPrecipitation();
     }
 
     /**

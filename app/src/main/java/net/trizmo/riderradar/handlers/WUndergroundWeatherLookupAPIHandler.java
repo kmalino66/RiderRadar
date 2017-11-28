@@ -63,9 +63,25 @@ public class WUndergroundWeatherLookupAPIHandler {
     {
         JSONArray hourlyArray = apiResponse.getJSONArray("hourly_forecast");
 
+        WeatherObject[] weatherObjects = new WeatherObject[hourlyArray.length()];
+
         for(int i = 0; i < hourlyArray.length(); i++)
         {
+            //Get the hourly info from the json
             String temp = hourlyArray.getJSONObject(i).getJSONArray("temp").getJSONObject(0).toString();
+            String wspd = hourlyArray.getJSONObject(i).getJSONArray("wspd").getJSONObject(0).toString();
+            String pop = hourlyArray.getJSONObject(i).getJSONArray("pop").getJSONObject(0).toString();
+
+            //Convert the information recieved from the web api
+            double temperature = Double.parseDouble(temp);
+            double windspeed = Double.parseDouble(wspd);
+            double percentOfPrecipitation = Double.parseDouble(pop);
+
+            weatherObjects[i] = new WeatherObject(temperature, windspeed, percentOfPrecipitation);
+
         }
+
+        //Return the weather objects for each hour that we got from the API.
+        return weatherObjects;
     }
 }

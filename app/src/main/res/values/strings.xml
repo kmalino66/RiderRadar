@@ -6,6 +6,9 @@
     <string name="menu_main_time">Time Select</string>
     <string name="title_activity_details">Details</string>
 
+    <string name="default_text">default</string>
+    <string name="default_score">100</string>
+
 
     <string name="percent_precipitation_clear">There is no planned precipitation for the day!</string>
     <string name="percent_precipitation_bad">There is a lot of precipitation planned for the day.

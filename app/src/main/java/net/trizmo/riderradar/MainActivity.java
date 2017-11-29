@@ -1,7 +1,10 @@
 package net.trizmo.riderradar;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -15,6 +18,9 @@ import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
+    public static final int PERMISSION_REQUEST_COARSE_LOCATION = 0;
+    public static final int PERMISSION_REQUEST_FINE_LOCATION = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,13 +33,69 @@ public class MainActivity extends AppCompatActivity {
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
         {
-            //TODO Request permission.
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.ACCESS_COARSE_LOCATION)) {
+                // Provide an additional rationale to the user if the permission was not granted
+                // and the user would benefit from additional context for the use of the permission.
+                // Display a SnackBar with a button to request the missing permission.
+                Snackbar.make(findViewById(R.id.frameLayout), "Location access required to determine the location for weather.",
+                        Snackbar.LENGTH_INDEFINITE).setAction("OK", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        // Request the permission
+                        ActivityCompat.requestPermissions(MainActivity.this,
+                                new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                                PERMISSION_REQUEST_COARSE_LOCATION);
+                    }
+                }).show();
+
+            } else {
+                Snackbar.make(findViewById(R.id.frameLayout),
+                        "Permission is not available. Requesting location permission.",
+                        Snackbar.LENGTH_SHORT).show();
+                // Request the permission. The result will be received in onRequestPermissionResult().
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                        PERMISSION_REQUEST_COARSE_LOCATION);
+            }
         }
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
         {
-            //TODO Request permission.
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.ACCESS_FINE_LOCATION)) {
+                // Provide an additional rationale to the user if the permission was not granted
+                // and the user would benefit from additional context for the use of the permission.
+                // Display a SnackBar with a button to request the missing permission.
+                Snackbar.make(findViewById(R.id.frameLayout), "Location access required to determine the location for weather.",
+                        Snackbar.LENGTH_INDEFINITE).setAction("OK", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        // Request the permission
+                        ActivityCompat.requestPermissions(MainActivity.this,
+                                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                                PERMISSION_REQUEST_FINE_LOCATION);
+                    }
+                }).show();
+
+            } else {
+                Snackbar.make(findViewById(R.id.frameLayout),
+                        "Permission is not available. Requesting location permission.",
+                        Snackbar.LENGTH_SHORT).show();
+                // Request the permission. The result will be received in onRequestPermissionResult().
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        PERMISSION_REQUEST_FINE_LOCATION);
+            }
         }
+    }
+
+    /**
+     * Start the Details Activity
+     */
+    private void launchDetailsActivity()
+    {
+        Intent detailsLaunchIntent = new Intent(this, DetailsActivity.class);
+        detailsLaunchIntent.putStringArrayListExtra(DetailsActivity.EXTRA_ARRAY_LIST, null);
+        startActivity(detailsLaunchIntent);
     }
 
     @Override
@@ -53,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
         circleProgressBar.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
-                //TODO Launch the details activity.
+                launchDetailsActivity();
                 return true;
             }
         });
@@ -65,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
         details.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
-                //TODO Launch the details activity.
+                launchDetailsActivity();
                 return true;
             }
         });

@@ -5,4 +5,13 @@
     <string name="menu_main_search">Search</string>
     <string name="menu_main_time">Time Select</string>
     <string name="title_activity_details">Details</string>
+
+
+    <string name="percent_precipitation_clear">There is no planned precipitation for the day!</string>
+    <string name="percent_precipitation_bad">There is a lot of precipitation planned for the day.
+    Might not be the best day to ride. =(</string>
+    <string name="percent_precipitation_ok">There is a slight chance of precipitation, but it should
+    be mostly clear.</string>
+
+
 </resources>

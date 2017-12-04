@@ -16,10 +16,18 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
 
+import net.trizmo.riderradar.scores.ScoreItem;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+
 public class MainActivity extends AppCompatActivity {
 
     public static final int PERMISSION_REQUEST_COARSE_LOCATION = 0;
     public static final int PERMISSION_REQUEST_FINE_LOCATION = 1;
+
+    private WeatherScore currentWeatherScore;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +39,12 @@ public class MainActivity extends AppCompatActivity {
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
 
+        requestCoarseLocationPermission();
+        requestFineLocationPermission();
+    }
+
+    private void requestCoarseLocationPermission()
+    {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
         {
             if (ActivityCompat.shouldShowRequestPermissionRationale(this,
@@ -58,7 +72,10 @@ public class MainActivity extends AppCompatActivity {
                         PERMISSION_REQUEST_COARSE_LOCATION);
             }
         }
+    }
 
+    private void requestFineLocationPermission()
+    {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
         {
             if (ActivityCompat.shouldShowRequestPermissionRationale(this,
@@ -93,9 +110,16 @@ public class MainActivity extends AppCompatActivity {
      */
     private void launchDetailsActivity()
     {
+        ArrayList<ScoreItem> detailedScoreList = populateDetatiledScoreList();
+
         Intent detailsLaunchIntent = new Intent(this, DetailsActivity.class);
-        detailsLaunchIntent.putStringArrayListExtra(DetailsActivity.EXTRA_ARRAY_LIST, null);
+        detailsLaunchIntent.putParcelableArrayListExtra(DetailsActivity.EXTRA_ARRAY_LIST, null); //TODO
         startActivity(detailsLaunchIntent);
+    }
+
+    private ArrayList<ScoreItem> populateDetatiledScoreList()
+    {
+        return null; //TODO
     }
 
     @Override
@@ -103,8 +127,6 @@ public class MainActivity extends AppCompatActivity {
     {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main, menu);
-
-
 
         return true;
     }

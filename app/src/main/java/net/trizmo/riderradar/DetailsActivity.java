@@ -20,15 +20,12 @@ public class DetailsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_details);
-    }
 
-    public DetailsActivity(ArrayList<ScoreItem> descriptionItems)
-    {
-        this.descriptionItems = descriptionItems;
+        descriptionItems = this.getIntent().getParcelableArrayListExtra(EXTRA_ARRAY_LIST);
     }
 
     private void bindAdapter() {
-        if(descriptionItems != null && descriptionItems.size() > 0) {
+        if (descriptionItems != null && descriptionItems.size() > 0) {
             scoreItemAdapter = new ScoreItemAdapter(this, descriptionItems);
             ListView detailsList = (ListView) findViewById(R.id.details_listview);
             detailsList.setAdapter(scoreItemAdapter);

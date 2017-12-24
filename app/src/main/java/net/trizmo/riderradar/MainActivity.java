@@ -21,6 +21,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import net.trizmo.riderradar.scores.ScoreItem;
+import net.trizmo.riderradar.weather.WeatherScore;
 
 import java.util.ArrayList;
 
@@ -177,7 +178,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void refreshData()
     {
-        
+
     }
 
     /**

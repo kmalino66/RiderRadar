@@ -1,4 +1,4 @@
-package net.trizmo.riderradar;
+package net.trizmo.riderradar.weather;
 
 import net.trizmo.riderradar.weather.WeatherObject;
 

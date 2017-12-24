@@ -8,6 +8,11 @@
         android:title="@string/menu_main_search"
         app:showAsAction="ifRoom" />
     <item
+        android:id="@+id/menu_refresh"
+        android:icon="@drawable/ic_refresh_black_48dp"
+        android:title="Refresh"
+        app:showAsAction="ifRoom" />
+    <item
         android:id="@+id/menu_time_select"
         android:icon="@drawable/ic_timelapse_black_48dp"
         android:title="@string/menu_main_time"

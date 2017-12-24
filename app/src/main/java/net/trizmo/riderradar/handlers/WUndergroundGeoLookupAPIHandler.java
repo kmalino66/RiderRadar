@@ -40,6 +40,7 @@ public class WUndergroundGeoLookupAPIHandler {
     {
         BufferedReader reader = null;
 
+        // Make the call to the API
         URL url = new URL(apiAddress);
         reader = new BufferedReader(new InputStreamReader(url.openStream()));
         StringBuffer buffer = new StringBuffer();

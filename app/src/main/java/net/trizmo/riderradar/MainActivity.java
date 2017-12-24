@@ -1,8 +1,12 @@
 package net.trizmo.riderradar;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -18,7 +22,6 @@ import android.widget.TextView;
 
 import net.trizmo.riderradar.scores.ScoreItem;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
@@ -26,7 +29,10 @@ public class MainActivity extends AppCompatActivity {
     public static final int PERMISSION_REQUEST_COARSE_LOCATION = 0;
     public static final int PERMISSION_REQUEST_FINE_LOCATION = 1;
 
-    private WeatherScore currentWeatherScore;
+    public LocationManager locationManager;
+    public WeatherScore[] weatherScores;
+
+    private boolean useInputtedLocation = false;
 
 
     @Override
@@ -41,8 +47,20 @@ public class MainActivity extends AppCompatActivity {
 
         requestCoarseLocationPermission();
         requestFineLocationPermission();
+
+        locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+        verifyGPSAndSetLocationListener(locationManager);
+
     }
 
+    private void verifyGPSAndSetLocationListener(LocationManager locationManager)
+    {
+
+    }
+
+    /**
+     * Request permission from the user to use their Coarse location.
+     */
     private void requestCoarseLocationPermission()
     {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
@@ -74,6 +92,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Request permission from the user to use their fine location.
+     */
     private void requestFineLocationPermission()
     {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
@@ -110,27 +131,23 @@ public class MainActivity extends AppCompatActivity {
      */
     private void launchDetailsActivity()
     {
-        ArrayList<ScoreItem> detailedScoreList = populateDetatiledScoreList();
+        ArrayList<ScoreItem> detailedScoreList = populateDetailedScoreList();
 
         Intent detailsLaunchIntent = new Intent(this, DetailsActivity.class);
         detailsLaunchIntent.putParcelableArrayListExtra(DetailsActivity.EXTRA_ARRAY_LIST, null); //TODO
         startActivity(detailsLaunchIntent);
     }
 
-    private ArrayList<ScoreItem> populateDetatiledScoreList()
+    private ArrayList<ScoreItem> populateDetailedScoreList()
     {
         return null; //TODO
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_main, menu);
 
-        return true;
-    }
 
+    /**
+     * Set the click listener for the circular progress bar.
+     */
     private void setProgressBarClickListener()
     {
         CircleProgressBar circleProgressBar = (CircleProgressBar) findViewById(R.id.custom_progressBar);
@@ -143,6 +160,9 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Set the click listener for the text view.
+     */
     private void setDetailsTextViewClickListener()
     {
         TextView details = (TextView) findViewById(R.id.details_textview);
@@ -155,13 +175,39 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void refreshData()
+    {
+        
+    }
+
+    /**
+     * Create the menu options for the main activity.
+     * @param menu - The menu opject to create.
+     * @return - true if the menu is created correctly.
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_main, menu);
+
+        return true;
+    }
+
+    /**
+     * Handle the clicks sent to the menu items.
+     * @param item - The item that was clicked.
+     * @return - True if handled, false if not.
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
-        //TODO Add refresh button, and handle it.
         switch (item.getItemId()) {
             case R.id.menu_search:
                 //TODO Search
+                return true;
+            case R.id.menu_refresh:
+                //TODO Refresh
                 return true;
             case R.id.menu_settings:
                 //TODO Settings
@@ -173,4 +219,5 @@ public class MainActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
-}
+
+ }

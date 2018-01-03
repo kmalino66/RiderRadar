@@ -1,6 +1,7 @@
 package net.trizmo.riderradar.handlers;
 
 import net.trizmo.riderradar.weather.WeatherObject;
+import net.trizmo.riderradar.weather.WeatherScore;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -59,7 +60,7 @@ public class WUndergroundWeatherLookupAPIHandler {
         return buffer.toString();
     }
 
-    private WeatherObject[] getHourlyWeatherInformation() throws Exception
+    public WeatherObject[] getHourlyWeatherInformation() throws Exception
     {
         JSONArray hourlyArray = apiResponse.getJSONArray("hourly_forecast");
 

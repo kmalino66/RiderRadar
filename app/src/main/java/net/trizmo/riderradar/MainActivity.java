@@ -1,12 +1,12 @@
 package net.trizmo.riderradar;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
+import android.provider.Telephony;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -19,21 +19,35 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
+
+import net.trizmo.riderradar.handlers.LocationHandler;
+import net.trizmo.riderradar.handlers.WUndergroundGeoLookupAPIHandler;
+import net.trizmo.riderradar.handlers.WUndergroundWeatherLookupAPIHandler;
 import net.trizmo.riderradar.scores.ScoreItem;
+import net.trizmo.riderradar.weather.WeatherObject;
 import net.trizmo.riderradar.weather.WeatherScore;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
     public static final int PERMISSION_REQUEST_COARSE_LOCATION = 0;
     public static final int PERMISSION_REQUEST_FINE_LOCATION = 1;
 
-    public LocationManager locationManager;
     public WeatherScore[] weatherScores;
+    public Location lastLocation;
 
     private boolean useInputtedLocation = false;
+    private boolean hasCoarseLocation = false;
+    private boolean hasFineLocation = false;
+    private GoogleApiClient apiClient;
 
 
     @Override
@@ -49,14 +63,10 @@ public class MainActivity extends AppCompatActivity {
         requestCoarseLocationPermission();
         requestFineLocationPermission();
 
-        locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-        verifyGPSAndSetLocationListener(locationManager);
-
-    }
-
-    private void verifyGPSAndSetLocationListener(LocationManager locationManager)
-    {
-
+        apiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(new LocationHandler(this))
+                .addOnConnectionFailedListener(new LocationHandler(this))
+                .addApi(LocationServices.API).build();
     }
 
     /**
@@ -145,6 +155,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    public void getLocation()
+    {
+        if (hasCoarseLocation && hasFineLocation)
+        {
+            try
+            {
+                lastLocation = LocationServices.FusedLocationApi.getLastLocation(apiClient);
+            }
+            catch (SecurityException e)
+            {
+                e.printStackTrace();
+            }
+
+        }
+    }
+
 
     /**
      * Set the click listener for the circular progress bar.
@@ -178,7 +204,36 @@ public class MainActivity extends AppCompatActivity {
 
     private void refreshData()
     {
+        //TODO get location and update data
+        getLocation();
 
+        try {
+            WUndergroundGeoLookupAPIHandler geoLookup = new WUndergroundGeoLookupAPIHandler(lastLocation.getLatitude(), lastLocation.getLongitude());
+            String weatherLookupURL = geoLookup.getLocationRequestURLEnding();
+            WUndergroundWeatherLookupAPIHandler weatherLookup = new WUndergroundWeatherLookupAPIHandler(weatherLookupURL);
+            WeatherObject[] hourlyWeather = weatherLookup.getHourlyWeatherInformation();
+        }catch (Exception e)
+        {
+            Toast.makeText(this, "Unable to update weather information.", Toast.LENGTH_LONG);
+        }
+
+    }
+
+    public Address getAddress(double latitude, double longitude)
+    {
+        Geocoder geocoder;
+        List<Address> addressList;
+        geocoder = new Geocoder(this, Locale.getDefault());
+
+        try {
+            addressList = geocoder.getFromLocation(latitude,longitude, 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
+            return addressList.get(0);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     /**

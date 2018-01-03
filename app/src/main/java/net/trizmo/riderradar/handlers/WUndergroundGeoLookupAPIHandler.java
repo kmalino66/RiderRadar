@@ -25,7 +25,7 @@ public class WUndergroundGeoLookupAPIHandler {
      * @param longitude - The longitude of the current location.
      * @throws Exception
      */
-    public WUndergroundGeoLookupAPIHandler(long latitude, long longitude) throws Exception
+    public WUndergroundGeoLookupAPIHandler(double latitude, double longitude) throws Exception
     {
         //We want to use Lat,Long
         String callAddress = API_GEO_CALL + latitude + "," + longitude;

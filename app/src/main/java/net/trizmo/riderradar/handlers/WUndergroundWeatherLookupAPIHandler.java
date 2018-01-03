@@ -60,7 +60,7 @@ public class WUndergroundWeatherLookupAPIHandler {
         return buffer.toString();
     }
 
-    public WeatherObject[] getHourlyWeatherInformation() throws Exception
+    public WeatherScore[] getHourlyWeatherInformation() throws Exception
     {
         JSONArray hourlyArray = apiResponse.getJSONArray("hourly_forecast");
 

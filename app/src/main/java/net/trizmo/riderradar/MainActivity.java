@@ -211,29 +211,14 @@ public class MainActivity extends AppCompatActivity {
             WUndergroundGeoLookupAPIHandler geoLookup = new WUndergroundGeoLookupAPIHandler(lastLocation.getLatitude(), lastLocation.getLongitude());
             String weatherLookupURL = geoLookup.getLocationRequestURLEnding();
             WUndergroundWeatherLookupAPIHandler weatherLookup = new WUndergroundWeatherLookupAPIHandler(weatherLookupURL);
-            WeatherObject[] hourlyWeather = weatherLookup.getHourlyWeatherInformation();
+            WeatherScore[] hourlyWeather = weatherLookup.getHourlyWeatherInformation();
+
+
         }catch (Exception e)
         {
             Toast.makeText(this, "Unable to update weather information.", Toast.LENGTH_LONG);
         }
 
-    }
-
-    public Address getAddress(double latitude, double longitude)
-    {
-        Geocoder geocoder;
-        List<Address> addressList;
-        geocoder = new Geocoder(this, Locale.getDefault());
-
-        try {
-            addressList = geocoder.getFromLocation(latitude,longitude, 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
-            return addressList.get(0);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return null;
     }
 
     /**

@@ -1,25 +1,14 @@
 package net.trizmo.riderradar.handlers;
 
-import android.content.Context;
-import android.location.Address;
-import android.location.Geocoder;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 
 import net.trizmo.riderradar.MainActivity;
 
-import java.util.List;
-import java.util.Locale;
-
-
-/**
- * Created by trizm on 1/2/2018.
- */
 
 public class LocationHandler implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
@@ -32,7 +21,6 @@ public class LocationHandler implements GoogleApiClient.ConnectionCallbacks, Goo
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        //TODO Get the location.
         mainActivity.getLocation();
 
     }

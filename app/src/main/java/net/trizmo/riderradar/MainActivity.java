@@ -1,12 +1,11 @@
 package net.trizmo.riderradar;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
-import android.provider.Telephony;
+import android.location.LocationManager;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -21,61 +20,49 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
 
-import net.trizmo.riderradar.handlers.LocationHandler;
 import net.trizmo.riderradar.handlers.WUndergroundGeoLookupAPIHandler;
 import net.trizmo.riderradar.handlers.WUndergroundWeatherLookupAPIHandler;
 import net.trizmo.riderradar.scores.ScoreItem;
-import net.trizmo.riderradar.weather.WeatherObject;
+import net.trizmo.riderradar.weather.WeatherAnalyzer;
 import net.trizmo.riderradar.weather.WeatherScore;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
     public static final int PERMISSION_REQUEST_COARSE_LOCATION = 0;
-    public static final int PERMISSION_REQUEST_FINE_LOCATION = 1;
 
     public WeatherScore[] weatherScores;
-    public Location lastLocation;
+
+    private FusedLocationProviderClient mFusedLocationClient;
+    private Location mLocation;
 
     private boolean useInputtedLocation = false;
-    private boolean hasCoarseLocation = false;
-    private boolean hasFineLocation = false;
-    private GoogleApiClient apiClient;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
         setContentView(R.layout.activity_main);
         setProgressBarClickListener();
         setDetailsTextViewClickListener();
 
-        Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
+        Toolbar myToolbar = findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
 
-        requestCoarseLocationPermission();
-        requestFineLocationPermission();
-
-        apiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(new LocationHandler(this))
-                .addOnConnectionFailedListener(new LocationHandler(this))
-                .addApi(LocationServices.API).build();
     }
 
     /**
-     * Request permission from the user to use their Coarse location.
+     * Request permission from the user to use their Fine location.
      */
-    private void requestCoarseLocationPermission()
-    {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
-        {
+    private void requestCoarseLocationPermission() {
+        if (!hasCoarseLocationPermission()) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                     Manifest.permission.ACCESS_COARSE_LOCATION)) {
                 // Provide an additional rationale to the user if the permission was not granted
@@ -94,54 +81,26 @@ public class MainActivity extends AppCompatActivity {
 
             } else {
                 Snackbar.make(findViewById(R.id.frameLayout),
-                        "Permission is not available. Requesting location permission.",
+                        "Did not get permission to use location.  We need the permission so that we can get the current location .",
                         Snackbar.LENGTH_SHORT).show();
                 // Request the permission. The result will be received in onRequestPermissionResult().
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
                         PERMISSION_REQUEST_COARSE_LOCATION);
             }
         }
     }
 
-    /**
-     * Request permission from the user to use their fine location.
-     */
-    private void requestFineLocationPermission()
-    {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
-        {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    Manifest.permission.ACCESS_FINE_LOCATION)) {
-                // Provide an additional rationale to the user if the permission was not granted
-                // and the user would benefit from additional context for the use of the permission.
-                // Display a SnackBar with a button to request the missing permission.
-                Snackbar.make(findViewById(R.id.frameLayout), "Location access required to determine the location for weather.",
-                        Snackbar.LENGTH_INDEFINITE).setAction("OK", new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        // Request the permission
-                        ActivityCompat.requestPermissions(MainActivity.this,
-                                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                                PERMISSION_REQUEST_FINE_LOCATION);
-                    }
-                }).show();
+    public boolean hasCoarseLocationPermission() {
+        int permission = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION);
 
-            } else {
-                Snackbar.make(findViewById(R.id.frameLayout),
-                        "Permission is not available. Requesting location permission.",
-                        Snackbar.LENGTH_SHORT).show();
-                // Request the permission. The result will be received in onRequestPermissionResult().
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                        PERMISSION_REQUEST_FINE_LOCATION);
-            }
-        }
+        return (permission == PackageManager.PERMISSION_GRANTED);
     }
 
     /**
      * Start the Details Activity
      */
-    private void launchDetailsActivity()
-    {
+    private void launchDetailsActivity() {
         ArrayList<ScoreItem> detailedScoreList = populateDetailedScoreList();
 
         Intent detailsLaunchIntent = new Intent(this, DetailsActivity.class);
@@ -149,34 +108,14 @@ public class MainActivity extends AppCompatActivity {
         startActivity(detailsLaunchIntent);
     }
 
-    private ArrayList<ScoreItem> populateDetailedScoreList()
-    {
+    private ArrayList<ScoreItem> populateDetailedScoreList() {
         return null; //TODO
     }
-
-
-    public void getLocation()
-    {
-        if (hasCoarseLocation && hasFineLocation)
-        {
-            try
-            {
-                lastLocation = LocationServices.FusedLocationApi.getLastLocation(apiClient);
-            }
-            catch (SecurityException e)
-            {
-                e.printStackTrace();
-            }
-
-        }
-    }
-
 
     /**
      * Set the click listener for the circular progress bar.
      */
-    private void setProgressBarClickListener()
-    {
+    private void setProgressBarClickListener() {
         CircleProgressBar circleProgressBar = (CircleProgressBar) findViewById(R.id.custom_progressBar);
         circleProgressBar.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -190,8 +129,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Set the click listener for the text view.
      */
-    private void setDetailsTextViewClickListener()
-    {
+    private void setDetailsTextViewClickListener() {
         TextView details = (TextView) findViewById(R.id.details_textview);
         details.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -202,24 +140,56 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void refreshData()
-    {
-        //TODO get location and update data
-        getLocation();
+    public void refreshData() {
 
-        try {
-            WUndergroundGeoLookupAPIHandler geoLookup = new WUndergroundGeoLookupAPIHandler(lastLocation.getLatitude(), lastLocation.getLongitude());
+        if (!useInputtedLocation && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            requestCoarseLocationPermission();
+            if(!hasCoarseLocationPermission()) return;
+        }
+        mFusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        // Got last known location. In some rare situations this can be null.
+                        if (location != null) {
+                            mLocation = location;
+                        }
+                        else
+                        {
+                            Snackbar.make(findViewById(R.id.frameLayout),
+                                    "Unable to retrieve current location to gather weather data.",
+                                    Snackbar.LENGTH_LONG);
+                        }
+                    }
+                });
+
+
+
+        try
+        {
+            WUndergroundGeoLookupAPIHandler geoLookup = new WUndergroundGeoLookupAPIHandler(mLocation.getLatitude(), mLocation.getLongitude());
             String weatherLookupURL = geoLookup.getLocationRequestURLEnding();
             WUndergroundWeatherLookupAPIHandler weatherLookup = new WUndergroundWeatherLookupAPIHandler(weatherLookupURL);
             WeatherScore[] hourlyWeather = weatherLookup.getHourlyWeatherInformation();
+            weatherScores = hourlyWeather;
 
+            WeatherAnalyzer analyzer = new WeatherAnalyzer(hourlyWeather);
 
-        }catch (Exception e)
-        {
-            Toast.makeText(this, "Unable to update weather information.", Toast.LENGTH_LONG);
+            updateWeatherScoreScreen(analyzer);
         }
-
+        catch (Exception e)
+        {
+            Toast.makeText(this, "Unable to update weather information.", Toast.LENGTH_LONG).show();
+        }
     }
+
+    public void updateWeatherScoreScreen(WeatherAnalyzer analyzer)
+    {
+        CircleProgressBar progressBar = findViewById(R.id.custom_progressBar);
+        progressBar.setProgress(analyzer.getTotalScore());
+    }
+
+
 
     /**
      * Create the menu options for the main activity.
@@ -235,6 +205,7 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+
     /**
      * Handle the clicks sent to the menu items.
      * @param item - The item that was clicked.
@@ -249,6 +220,7 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             case R.id.menu_refresh:
                 //TODO Refresh
+                refreshData();
                 return true;
             case R.id.menu_settings:
                 //TODO Settings
